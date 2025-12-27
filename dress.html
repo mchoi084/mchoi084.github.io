@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dress Up</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: "Comic Sans MS", "Arial Rounded MT Bold", sans-serif;
+            background: hsl(0, 5%, 67%);
+            text-align: center;
+        }
+        h1 { margin: 20px 0; }
+
+        .main-layout {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game {
+            position: sticky;
+            top: 20px;
+            width: 500px;
+            height: 500px;
+            flex-shrink: 0;
+            margin: 0;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); /* Soft Purple/Blue Gradient */
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .base-image {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        /* Assigning unique filter IDs to each part */
+        #hair-back-img { filter: url(#hairFilter); z-index: 0; }
+        #skin-img { filter: url(#skinFilter); z-index: 1; }
+        #outline-img { filter: url(#skinFilter); z-index: 2; }
+        #white-img { filter: none; z-index: 3; }
+        #eye-img { filter: url(#eyeFilter); z-index: 4; }
+        #eyebrows-img { filter: none; z-index: 5; }
+        #mouth-img { filter: none; z-index: 6; }
+        #hair-top-img { filter: url(#hairFilter); z-index: 7; }
+        #top-img { filter: url(#topFilter); z-index: 8; }
+        #socks-img { filter: url(#sockFilter); z-index: 9; }
+        #shoes-img { filter: url(#shoeFilter); z-index: 10; }
+        #bottom-img { filter: url(#bottomFilter); z-index: 11; }
+        #hands-img { filter: none; z-index: 12; }
+        #glasses-img { filter: none; z-index: 13; }
+
+        .panel-container {
+            background: #fff0f6;
+            margin: 0;
+            width: 95%;
+            max-width: 500px;
+            height: 500px;
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+            text-align: left; 
+        }
+
+        .tabs {
+            display: flex;
+            flex-direction: column;
+            background: #ffe6f2;
+            width: 120px;
+            border-right: 1px solid #ddd;
+            padding-top: 10px;
+            overflow-y: auto;
+        }
+
+        .tab-button {
+            padding: 15px 10px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #888;
+            text-align: left;
+            transition: 0.3s;
+        }
+
+        .tab-button.active {
+            font-weight: bold;
+            color: #ff69b4;
+            background: white;
+            border-left: 4px solid #ff69b4;
+        }
+
+        .tab-content { 
+            flex: 1; 
+            display: none; 
+            padding: 20px; 
+            height: 500px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .tab-content.active { display: block; }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .selection-grid button {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .selection-grid button:hover { background: #ffe6f2; }
+        .picker-group { text-align: center; }
+        input[type="color"] { width: 60px; height: 30px; border: none; cursor: pointer; background: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Dress Up</h1>
+
+    <!-- SVG Filters: These act as the "engine" for the colors -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="skinFilter">
+            <feColorMatrix type="matrix" id="skinMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="eyeFilter">
+            <feColorMatrix type="matrix" id="eyeMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="hairFilter">
+            <feColorMatrix type="matrix" id="hairMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="topFilter">
+            <feColorMatrix type="matrix" id="topMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="bottomFilter">
+            <feColorMatrix type="matrix" id="bottomMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="sockFilter">
+            <feColorMatrix type="matrix" id="sockMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+        <filter id="shoeFilter">
+            <feColorMatrix type="matrix" id="shoeMatrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 1 0" />
+        </filter>
+    </svg>
+
+    <div class="main-layout">
+    <div class="game">
+        <img id="hair-back-img" src="hair_back1.PNG" class="base-image">
+        <img id="skin-img" src="skin.PNG" class="base-image">
+        <img id="outline-img" src="outline.PNG" class="base-image">
+        <img id="white-img" src="white.PNG" class="base-image">
+        <img id="eye-img" src="eye.PNG" class="base-image">
+        <img id="eyebrows-img" src="eyebrows.PNG" class="base-image">
+        <img id="mouth-img" src="mouth1.PNG" class="base-image">
+        <img id="hair-top-img" src="hair_top1.PNG" class="base-image">
+        <img id="top-img" src="top1.PNG" class="base-image">
+        <img id="socks-img" src="socks3.PNG" class="base-image">
+        <img id="shoes-img" src="shoes1.PNG" class="base-image">
+        <img id="bottom-img" src="bottom1.PNG" class="base-image">
+        <img id="hands-img" src="" class="base-image">
+        <img id="glasses-img" src="" class="base-image">
+    </div>
+
+    <div class="panel-container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'BodyTab')">Body</button>
+            <button class="tab-button" onclick="openTab(event, 'MouthTab')">Mouth</button>
+            <button class="tab-button" onclick="openTab(event, 'HairTopTab')">Hair (Top)</button>
+            <button class="tab-button" onclick="openTab(event, 'HairBackTab')">Hair (Back)</button>
+            <button class="tab-button" onclick="openTab(event, 'TopTab')">Top</button>
+            <button class="tab-button" onclick="openTab(event, 'BottomTab')">Bottom</button>
+            <button class="tab-button" onclick="openTab(event, 'SockTab')">Socks</button>
+            <button class="tab-button" onclick="openTab(event, 'ShoeTab')">Shoes</button>
+            <button class="tab-button" onclick="openTab(event, 'AccessoryTab')">Accessories</button>
+            <button class="tab-button" onclick="openTab(event, 'HandTab')">Hands</button>        
+        </div>
+
+        <div id="BodyTab" class="tab-content active">
+            <div style="display:flex; justify-content:space-around;">
+                <div class="picker-group"><p>Skin</p><input type="color" value="#aa683c" oninput="applyColor('skin', this.value)"></div>
+                <div class="picker-group"><p>Eyes</p><input type="color" value="#0080ff" oninput="applyColor('eye', this.value)"></div>
+            </div>
+        </div>
+
+        <div id="MouthTab" class="tab-content">
+            <p>Select Expression</p>
+            <div class="selection-grid">
+                <button onclick="changeMouth(1)">Smile</button>
+                <button onclick="changeMouth(2)">Eh</button>
+                <button onclick="changeMouth(3)">:3</button>
+                <button onclick="changeMouth(4)">Woah</button>
+                <button onclick="changeMouth(5)">Ooo</button>
+                <button onclick="changeMouth(6)">Ahh</button>
+            </div>
+        </div>
+
+        <div id="HairTopTab" class="tab-content">
+            <div class="picker-group"><p>Hair Color</p><input type="color" value="#361e0c" oninput="applyColor('hair', this.value)"></div>
+            <p>Style</p>
+            <div class="selection-grid">
+                <button onclick="changeHairTop(0)">None</button>          
+                <button onclick="changeHairTop(1)">Bangs1</button>
+                <button onclick="changeHairTop(2)">Bangs2</button>
+                <button onclick="changeHairTop(3)">Bangs3</button>
+                <button onclick="changeHairTop(4)">Bangs4</button>
+                <button onclick="changeHairTop(5)">Bangs5</button>
+            </div>
+        </div>
+
+        <div id="HairBackTab" class="tab-content">
+            <div class="picker-group"><p>Hair Color</p><input type="color" value="#361e0c" oninput="applyColor('hair', this.value)"></div>
+            <p>Style</p>
+            <div class="selection-grid">
+                <button onclick="changeHairBack(0)">None</button>
+                <button onclick="changeHairBack(1)">Back1</button>
+                <button onclick="changeHairBack(2)">Back2</button>
+                <button onclick="changeHairBack(3)">Back3</button>
+                <button onclick="changeHairBack(4)">Back4</button>
+                <button onclick="changeHairBack(5)">Back5</button>
+                <button onclick="changeHairBack(6)">Back6</button>
+                <button onclick="changeHairBack(7)">Back7</button>
+                <button onclick="changeHairBack(8)">Back8</button>
+            </div>
+        </div>
+
+        <div id="TopTab" class="tab-content">
+            <div class="picker-group"><p>Top Color</p><input type="color" value="#2E6F40" oninput="applyColor('top', this.value)"></div>
+            <p>Pick Top</p>
+            <div class="selection-grid">
+                <button onclick="changeTop(1)">Sweater</button>
+                <button onclick="changeTop(2)">TShirt</button>
+                <button onclick="changeTop(3)">Striped</button>
+                <button onclick="changeTop(4)">Spagetti</button>
+                <button onclick="changeTop(5)">TankTop</button>
+                <button onclick="changeTop(6)">Floral</button>
+            </div>
+        </div>
+
+        <div id="BottomTab" class="tab-content">
+            <div class="picker-group"><p>Bottom Color</p><input type="color" value="#4682B4" oninput="applyColor('bottom', this.value)"></div>
+            <p>Pick Bottom</p>
+            <div class="selection-grid">
+                <button onclick="changeBottom(1)">Pants</button>
+                <button onclick="changeBottom(2)">Skirt</button>
+                <button onclick="changeBottom(3)">Pleated</button>
+                <button onclick="changeBottom(4)">Shorts</button>
+                <button onclick="changeBottom(5)">Sweatpants</button>
+                <button onclick="changeBottom(6)">BoxShorts</button>
+            </div>
+        </div>
+
+        <div id="SockTab" class="tab-content">
+            <div class="picker-group"><p>Sock Color</p><input type="color" value="#C5C6D0" oninput="applyColor('sock', this.value)"></div>
+            <p>Pick Socks</p>
+            <div class="selection-grid">
+                <button onclick="changeSocks(0)">None</button>
+                <button onclick="changeSocks(1)">Stockings</button>
+                <button onclick="changeSocks(2)">Long</button>
+                <button onclick="changeSocks(3)">Ankle</button>
+                <button onclick="changeSocks(4)">Mismatched</button>
+            </div>
+        </div>
+
+        <div id="ShoeTab" class="tab-content">
+            <div class="picker-group"><p>Shoe Color</p><input type="color" value="#41424C" oninput="applyColor('shoe', this.value)"></div>
+            <p>Pick Shoes</p>
+            <div class="selection-grid">
+                <button onclick="changeShoes(0)">None</button>
+                <button onclick="changeShoes(1)">Shoe</button>
+                <button onclick="changeShoes(2)">Flats</button>
+                <button onclick="changeShoes(3)">Slipper</button>
+            </div>
+        </div>
+
+        <div id="AccessoryTab" class="tab-content">
+            <p>Pick Accessories</p>
+            <div class="selection-grid">
+                <button onclick="changeAccessory(0)">None</button>
+                <button onclick="changeAccessory(1)">Glasses</button>
+                <button onclick="changeAccessory(2)">Pixel</button>
+                <button onclick="changeAccessory(3)">Heart</button>
+            </div>
+        </div>
+
+        <div id="HandTab" class="tab-content">
+            <p>Pick Item</p>
+            <div class="selection-grid">
+                <button onclick="changeHands(0)">None</button>
+                <button onclick="changeHands(1)">IcedDrink</button>
+                <button onclick="changeHands(2)">Primo</button>
+                <button onclick="changeHands(3)">Gift</button>
+                <button onclick="changeHands(4)">Coffee</button>
+                <button onclick="changeHands(5)">Boba</button>
+                <button onclick="changeHands(6)">Book</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) contents[i].style.display = "none";
+            const buttons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+        
+        function applyColor(part, hex) {
+            const r = parseInt(hex.slice(1, 3), 16) / 255;
+            const g = parseInt(hex.slice(3, 5), 16) / 255;
+            const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+            const matrix = document.getElementById(part + 'Matrix');
+            
+            matrix.setAttribute("values", `
+                ${r} 0 0 0 0
+                0 ${g} 0 0 0
+                0 0 ${b} 0 0
+                0 0 0 1 0
+            `);
+        }
+
+        function changeMouth(num) {
+            document.getElementById('mouth-img').src = "mouth" + num + ".PNG";
+        }
+
+        function changeHairTop(num) {
+            document.getElementById('hair-top-img').src = "hair_top" + num + ".PNG";
+        }
+
+        function changeHairBack(num) {
+            document.getElementById('hair-back-img').src = "hair_back" + num + ".PNG";
+        }
+
+        function changeTop(num) {
+            document.getElementById('top-img').src = "top" + num + ".PNG";
+        }
+
+        function changeBottom(num) {
+            document.getElementById('bottom-img').src = "bottom" + num + ".PNG";
+        }
+
+        function changeSocks(num) {
+            document.getElementById('socks-img').src = "socks" + num + ".PNG";
+        }
+
+        function changeShoes(num) {
+            document.getElementById('shoes-img').src = "shoes" + num + ".PNG";
+        }
+
+        function changeAccessory(num) {
+            document.getElementById('glasses-img').src = "glasses" + num + ".PNG";
+        }
+
+        function changeHands(num) {
+            document.getElementById('hands-img').src = "hand" + num + ".PNG";
+        }
+
+        // Initialize default colors
+        window.onload = () => {
+            applyColor('skin', "#aa683c");
+            applyColor('eye', "#0080ff");
+            applyColor('hair', "#361e0c");
+            applyColor('top', "#2E6F40");
+            applyColor('bottom', "#4682B4");
+            applyColor('sock', "#C5C6D0");
+            applyColor('shoe', "#41424C");
+        };
+    </script>
+</body>
+</html>
